@@ -1,14 +1,14 @@
 import {ReactiveController, state} from '@snar/lit';
 
-interface VoiceVoxStyle {
+interface VoicevoxStyle {
 	id: number;
 	name: string;
 }
 
-interface VoiceVoxSpeaker {
+interface VoicevoxSpeaker {
 	name: string;
 	speaker_uuid: string;
-	styles: VoiceVoxStyle[];
+	styles: VoicevoxStyle[];
 }
 
 interface PlayOptions {
@@ -19,12 +19,12 @@ interface PlayOptions {
 
 type CachedAudio = Blob | Promise<Blob>;
 
-export class VoiceVoxClient extends ReactiveController {
+export class VoicevoxClient extends ReactiveController {
 	@state() state:
 		'disconnected' | 'connecting' | 'connection_error' | 'connected' =
 		'disconnected';
 
-	@state() speakers: VoiceVoxSpeaker[] = [];
+	@state() speakers: VoicevoxSpeaker[] = [];
 	@state() host: string;
 	@state() port: number;
 
@@ -92,7 +92,7 @@ export class VoiceVoxClient extends ReactiveController {
 		{voiceId = 0, speed = 1, volume = 1}: PlayOptions = {},
 	) {
 		if (this.state !== 'connected') {
-			throw new Error('VoiceVox is not connected');
+			throw new Error('VOICEVOX is not connected');
 		}
 
 		const key = this.getCacheKey(sentence, voiceId, speed);
@@ -160,7 +160,7 @@ export class VoiceVoxClient extends ReactiveController {
 
 		if (!queryResponse.ok) {
 			throw new Error(
-				`VoiceVox audio_query failed: HTTP ${queryResponse.status}`,
+				`VOICEVOX audio_query failed: HTTP ${queryResponse.status}`,
 			);
 		}
 
@@ -181,7 +181,7 @@ export class VoiceVoxClient extends ReactiveController {
 
 		if (!synthesisResponse.ok) {
 			throw new Error(
-				`VoiceVox synthesis failed: HTTP ${synthesisResponse.status}`,
+				`VOICEVOX synthesis failed: HTTP ${synthesisResponse.status}`,
 			);
 		}
 
@@ -283,7 +283,7 @@ export class VoiceVoxClient extends ReactiveController {
 		const styles = this.speakers.flatMap((speaker) => speaker.styles);
 
 		if (styles.length === 0) {
-			throw new Error('VoiceVox has no available voices');
+			throw new Error('VOICEVOX has no available voices');
 		}
 
 		return styles[Math.floor(Math.random() * styles.length)]!.id;
@@ -306,4 +306,4 @@ export class VoiceVoxClient extends ReactiveController {
 	}
 }
 
-export const voicevox = new VoiceVoxClient();
+export const voicevox = new VoicevoxClient();

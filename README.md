@@ -32,9 +32,12 @@ try {
 ```ts
 voicevox.play(
 	'こんにちは', // text
-	'af_sky', // voice (ts suggestions support)
-	1, // speed
-	1, // volume
+	// options
+	{
+		voiceId: 0,
+		speed: 1,
+		volume: 1,
+	},
 );
 ```
 
