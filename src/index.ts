@@ -41,10 +41,6 @@ export class VoicevoxClient extends ReactiveController {
 		this.port = port;
 	}
 
-	protected updated(_changedProperties: any): Promise<void> | void {
-		console.log(_changedProperties);
-	}
-
 	private get endpoint() {
 		return `http://${this.host}:${this.port}`;
 	}
