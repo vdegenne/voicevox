@@ -10,7 +10,7 @@ npm i -D @vdegenne/voicevox
 
 ## Usage
 
-First install and run <a href="https://chatgpt.com/?prompt=What%27s%20the%20easiest%20way%20to%20install%20VoiceVox%20server%20on%20my%20computer?">VOICEVOX</a> on your machine.
+First install and run <a href="https://chatgpt.com/?prompt=What%27s%20the%20easiest%20way%20to%20install%20VoiceVox%20server%20on%20my%20computer?" target=_blank>VOICEVOX</a> on your machine.
 
 Then in your web app
 

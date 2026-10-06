@@ -11,6 +11,12 @@ interface VoiceVoxSpeaker {
 	styles: VoiceVoxStyle[];
 }
 
+interface PlayOptions {
+	voiceId?: number;
+	speed?: number;
+	volume?: number;
+}
+
 type CachedAudio = Blob | Promise<Blob>;
 
 export class VoiceVoxClient extends ReactiveController {
@@ -81,7 +87,10 @@ export class VoiceVoxClient extends ReactiveController {
 		this.state = 'disconnected';
 	}
 
-	async play(sentence: string, voiceId: number, speed: number, volume = 1) {
+	async play(
+		sentence: string,
+		{voiceId = 0, speed = 1, volume = 1}: PlayOptions = {},
+	) {
 		if (this.state !== 'connected') {
 			throw new Error('VoiceVox is not connected');
 		}
@@ -132,18 +141,13 @@ export class VoiceVoxClient extends ReactiveController {
 		}
 	}
 
-	async togglePlay(
-		sentence: string,
-		voiceId: number,
-		speed: number,
-		volume = 1,
-	) {
+	async togglePlay(sentence: string, options: PlayOptions = {}) {
 		if (this.currentAudios.size > 0) {
 			this.stop();
 			return;
 		}
 
-		return this.play(sentence, voiceId, speed, volume);
+		return this.play(sentence, options);
 	}
 
 	private async fetchAudio(sentence: string, voiceId: number, speed: number) {
@@ -267,7 +271,11 @@ export class VoiceVoxClient extends ReactiveController {
 		this.currentAudios.clear();
 	}
 
-	private getCacheKey(sentence: string, voiceId: number, speed: number) {
+	private getCacheKey(
+		sentence: string,
+		voiceId: number | undefined,
+		speed: number,
+	) {
 		return `${voiceId}:${speed}:${sentence}`;
 	}
 
