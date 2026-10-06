@@ -41,6 +41,10 @@ export class VoicevoxClient extends ReactiveController {
 		this.port = port;
 	}
 
+	protected updated(_changedProperties: any): Promise<void> | void {
+		console.log(_changedProperties);
+	}
+
 	private get endpoint() {
 		return `http://${this.host}:${this.port}`;
 	}
@@ -68,7 +72,7 @@ export class VoicevoxClient extends ReactiveController {
 			const response = await fetch(`${this.endpoint}/speakers`);
 
 			if (!response.ok) {
-				throw new Error(`VoiceVox returned HTTP ${response.status}`);
+				throw new Error(`VOICEVOX returned HTTP ${response.status}`);
 			}
 
 			this.speakers = await response.json();
@@ -306,4 +310,4 @@ export class VoicevoxClient extends ReactiveController {
 	}
 }
 
-export const voicevox = new VoicevoxClient();
+// export const voicevox = new VoicevoxClient();
