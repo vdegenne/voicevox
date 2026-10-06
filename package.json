@@ -1,0 +1,38 @@
+{
+	"name": "@vdegenne/voicevox",
+	"version": "0.1.11",
+	"description": "Snar reactive controller TS helper to interact with VoiceVox TTS server.",
+	"type": "module",
+	"exports": {
+		".": {
+			"import": "./lib/index.js",
+			"types": "./lib/index.d.ts"
+		}
+	},
+	"files": [
+		"./lib"
+	],
+	"scripts": {
+		"build": "wireit"
+	},
+	"wireit": {
+		"build": {
+			"command": "tsc --pretty",
+			"clean": "if-file-deleted",
+			"files": [
+				"./tsconfig.json",
+				"./src"
+			],
+			"output": [
+				"./lib"
+			]
+		}
+	},
+	"devDependencies": {
+		"typescript": "^7.0.2",
+		"wireit": "^0.14.13"
+	},
+	"dependencies": {
+		"@snar/lit": "^1.8.1"
+	}
+}
