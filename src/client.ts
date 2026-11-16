@@ -51,7 +51,7 @@ export class VoicevoxProxyClient {
 	}
 
 	private async fetchSpeakers(): Promise<VoicevoxSpeaker[]> {
-		const response = await fetch(`${this.endpoint}/speakers`);
+		const response = await this.fetch(`${this.endpoint}/speakers`);
 
 		if (!response.ok) {
 			throw await this.createResponseError(
@@ -147,7 +147,7 @@ export class VoicevoxProxyClient {
 			speaker: String(options.speaker),
 		});
 
-		const queryResponse = await fetch(
+		const queryResponse = await this.fetch(
 			`${this.endpoint}/audio_query?${queryParams}`,
 			{method: 'POST'},
 		);
@@ -162,7 +162,7 @@ export class VoicevoxProxyClient {
 		const audioQuery = (await queryResponse.json()) as Record<string, unknown>;
 		audioQuery.speedScale = options.speed;
 
-		const synthesisResponse = await fetch(
+		const synthesisResponse = await this.fetch(
 			`${this.endpoint}/synthesis?speaker=${options.speaker}`,
 			{
 				method: 'POST',
@@ -181,6 +181,18 @@ export class VoicevoxProxyClient {
 		}
 
 		return synthesisResponse.blob();
+	}
+
+	// HTTP
+
+	private async fetch(url: string, options?: RequestInit): Promise<Response> {
+		try {
+			return await fetch(url, options);
+		} catch (error) {
+			const path = new URL(url).pathname;
+
+			throw new Error(`VOICEVOX request failed (${path})`, {cause: error});
+		}
 	}
 
 	// Errors
