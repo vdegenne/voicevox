@@ -1,60 +1,152 @@
 # @vdegenne/voicevox
 
-Snar reactive controller TS helper to interact with a VOICEVOX TTS server.
+Lightweight TypeScript client for interacting with a local VOICEVOX TTS engine.
 
 ## Install
 
 ```bash
-npm i -D @vdegenne/voicevox
+npm install @vdegenne/voicevox
 ```
+
+## Requirements
+
+Install and run [VOICEVOX](https://voicevox.hiroshiba.jp/) on your machine.
+
+The client connects to `http://127.0.0.1:50021` by default.
 
 ## Usage
 
-First install and run <a href="https://chatgpt.com/?prompt=What%27s%20the%20easiest%20way%20to%20install%20VoiceVox%20server%20on%20my%20computer?" target=_blank>VOICEVOX</a> on your machine.
-
-Then in your web app
-
 ```ts
-import {VoicevoxClient} from '@vdegenne/voicevox';
+import {VoicevoxProxyClient} from '@vdegenne/voicevox';
 
-const voicevox = new VoicevoxClient();
+const voicevox = new VoicevoxProxyClient();
+
+const options = {
+	input: 'こんにちは',
+	speaker: 0,
+	speed: 1,
+};
 
 try {
-	await voicevox.connect();
-	voicevox.play('こんにちは');
-} catch (err) {
-	console.error(`Server not reachable. (${err})`);
+	const audio = await voicevox.getAudio(options);
+
+	// Use the returned Blob with your audio player.
+} catch (error) {
+	console.error('VOICEVOX request failed:', error);
 }
 ```
 
-### Arguments
+### Configuration
+
+You can specify a custom VOICEVOX server endpoint:
 
 ```ts
-voicevox.play(
-	'こんにちは', // text
-	// options
-	{
-		voiceId: 0,
-		speed: 1,
-		volume: 1,
-	},
-);
+const voicevox = new VoicevoxProxyClient('http://127.0.0.1:50021');
 ```
 
-### Controller
-
-`voicevox` is a controller, you can bind it to a `LitElement` custom element.
+### Speech options
 
 ```ts
-import {VoicevoxClient} from '@vdegenne/voicevox';
-import {LitElement, customElement} from 'lit';
-import {withController} from '@snar/lit';
-
-const voicevox = new VoicevoxClient();
-
-@customElement('settings-dialog')
-@withController(voicevox)
-class SettingsDialog extends LitElement {
-	// ...
+{
+	input: 'こんにちは',
+	speaker: 0,
+	speed: 1,
 }
+```
+
+| Property  | Type     | Default  | Description             |
+| --------- | -------- | -------- | ----------------------- |
+| `input`   | `string` | Required | Text to synthesize      |
+| `speaker` | `number` | Required | VOICEVOX style ID       |
+| `speed`   | `number` | `1`      | Speech speed multiplier |
+
+## Audio requests
+
+`createAudioRequest()` returns an audio request descriptor containing a cache key and a function that resolves to the audio Blob.
+
+```ts
+const request = await voicevox.createAudioRequest({
+	input: 'こんにちは',
+	speaker: 0,
+});
+
+console.log(request.key);
+
+const audio = await request.audio();
+```
+
+Both `getAudio()` and `createAudioRequest()` use an in-memory cache to avoid generating the same audio multiple times.
+
+## Voices
+
+The client provides methods to retrieve and search available VOICEVOX speakers and styles.
+
+### Get speakers
+
+```ts
+const speakers = await voicevox.getSpeakers();
+```
+
+Speakers are fetched lazily on the first request and cached in memory for subsequent calls. Concurrent requests share the same pending fetch.
+
+### Get available voices
+
+`getVoices()` returns a flattened list of available styles.
+
+```ts
+const voices = await voicevox.getVoices();
+
+// Example result:
+// {
+//   id: 2,
+//   name: '四国めたん (ノーマル)',
+//   speakerName: '四国めたん',
+//   styleName: 'ノーマル'
+// }
+```
+
+### Find a voice by ID
+
+```ts
+const voice = await voicevox.getVoiceById(2);
+
+console.log(voice?.name);
+```
+
+### Find a voice ID by name
+
+```ts
+const voiceId = await voicevox.getVoiceIdByName('四国めたん (ノーマル)');
+```
+
+Both lookup methods return `undefined` if no matching voice is found.
+
+## Error handling
+
+The client throws standard JavaScript `Error` instances when a request fails.
+
+```ts
+try {
+	const speakers = await voicevox.getSpeakers();
+} catch (error) {
+	console.error(error);
+}
+```
+
+HTTP error responses are inspected for a descriptive error message. The client also supports the VOICEVOX engine's native `detail` error field.
+
+Failed speaker requests are not cached, allowing subsequent calls to retry.
+
+## Exports
+
+The package exposes the client from its root entry point:
+
+```ts
+import {VoicevoxProxyClient} from '@vdegenne/voicevox';
+```
+
+Core types and utilities are available through the `/core` subpath:
+
+```ts
+import type {VoicevoxSpeechOptions} from '@vdegenne/voicevox/core';
 ```

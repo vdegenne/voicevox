@@ -1,0 +1,7 @@
+- [ ] Maybe `core.ts` shouldn't hardcore speakers values and rely on voicevox native speakers endpoints, but we have to make sure the response is cached if it was unchanged (to avoid clients making too much requests.)
+- [ ] **Réduire max-age:** par exemple à 1 jour ou 1 semaine. Une fois cette durée écoulée, le navigateur recontactera le serveur et pourra utiliser ETag / If-None-Match pour éviter de retélécharger un fichier inchangé.
+- [ ] **VOICEVOX proxy – HTTP caching:** Implement HTTP caching for the `/speakers` endpoint. The proxy should cache the VOICEVOX response in memory to avoid repeatedly querying the engine, and return an appropriate `Cache-Control` header (e.g. `public, max-age=604800`) so clients can cache the response locally for 7 days, avoiding unnecessary network requests on subsequent page loads.
+- [ ] Permettre aux clients de pouvoir abort les requetes grace a un signal.
+- [ ] Allow abort signals for generation requests.
+- [ ] **VOICEVOX client – Speaker validation:** Improve validation of the `/speakers` response before caching it, ensuring malformed speaker data cannot become a persistent cached result.
+- Renommer le paquet en `voicevox-proxy`
