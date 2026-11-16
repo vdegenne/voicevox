@@ -191,12 +191,16 @@ export class VoicevoxProxyClient {
 		} catch (error) {
 			const path = new URL(url).pathname;
 
-			throw new Error(`VOICEVOX request failed (${path})`, {cause: error});
+			throw new Error(
+				`VOICEVOX request failed for ${path}. Is the proxy running?`,
+				{cause: error},
+			);
 		}
 	}
 
 	// Errors
 
+	// TODO: When proxy will get implemented we should remove body.detail
 	private async createResponseError(
 		response: Response,
 		fallback: string,
@@ -210,12 +214,9 @@ export class VoicevoxProxyClient {
 				typeof body === 'object' &&
 				body !== null &&
 				'error' in body &&
-				typeof body.error === 'object' &&
-				body.error !== null &&
-				'message' in body.error &&
-				typeof body.error.message === 'string'
+				typeof body.error === 'string'
 			) {
-				message = body.error.message;
+				message = body.error;
 			} else if (
 				typeof body === 'object' &&
 				body !== null &&
