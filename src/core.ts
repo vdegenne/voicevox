@@ -1,28 +1,28 @@
-export interface VoicevoxStyle {
+export interface Style {
 	readonly name: string;
 	readonly id: number;
 	readonly type: string;
 }
 
-export interface VoicevoxSpeaker {
+export interface Speaker {
 	readonly name: string;
 	readonly speaker_uuid: string;
-	readonly styles: readonly VoicevoxStyle[];
+	readonly styles: readonly Style[];
 	readonly version: string;
 	readonly supported_features: {
 		readonly permitted_synthesis_morphing: 'ALL' | 'SELF_ONLY' | 'NOTHING';
 	};
 }
 
-export interface VoicevoxSpeechOptions {
+export interface SpeechOptions {
 	input: string;
 	speaker: number;
 	speed?: number;
 }
 
 export function normalizeSpeechOptions(
-	options: VoicevoxSpeechOptions,
-): Required<VoicevoxSpeechOptions> {
+	options: SpeechOptions,
+): Required<SpeechOptions> {
 	function normalize(value: string): string {
 		return value.replace(/[^\S\r\n]+/g, ' ').trim();
 	}
@@ -34,9 +34,7 @@ export function normalizeSpeechOptions(
 	};
 }
 
-export async function getCacheKey(
-	options: VoicevoxSpeechOptions,
-): Promise<string> {
+export async function getCacheKey(options: SpeechOptions): Promise<string> {
 	const normalized = normalizeSpeechOptions(options);
 	const payload = JSON.stringify(Object.values(normalized));
 

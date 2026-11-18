@@ -1,16 +1,16 @@
 import {
 	getCacheKey,
 	normalizeSpeechOptions,
-	type VoicevoxSpeaker,
-	type VoicevoxSpeechOptions,
+	type Speaker,
+	type SpeechOptions,
 } from './core.js';
 
-export interface VoicevoxAudioRequest {
+export interface AudioRequest {
 	key: string;
 	audio: () => Promise<Blob>;
 }
 
-export interface VoicevoxVoice {
+export interface Voice {
 	id: number;
 	name: string;
 	speakerName: string;
@@ -22,8 +22,8 @@ export class VoicevoxProxyClient {
 
 	private cache = new Map<string, Blob | Promise<Blob>>();
 
-	private speakers?: VoicevoxSpeaker[];
-	private speakersPromise?: Promise<VoicevoxSpeaker[]>;
+	private speakers?: Speaker[];
+	private speakersPromise?: Promise<Speaker[]>;
 
 	constructor(endpoint = 'http://127.0.0.1:50021') {
 		this.endpoint = endpoint.replace(/\/+$/, '');
@@ -31,7 +31,7 @@ export class VoicevoxProxyClient {
 
 	// Speakers
 
-	async getSpeakers(): Promise<VoicevoxSpeaker[]> {
+	async getSpeakers(): Promise<Speaker[]> {
 		if (this.speakers) {
 			return this.speakers;
 		}
@@ -50,7 +50,7 @@ export class VoicevoxProxyClient {
 		}
 	}
 
-	private async fetchSpeakers(): Promise<VoicevoxSpeaker[]> {
+	private async fetchSpeakers(): Promise<Speaker[]> {
 		const response = await this.fetch(`${this.endpoint}/speakers`);
 
 		if (!response.ok) {
@@ -66,10 +66,10 @@ export class VoicevoxProxyClient {
 			throw new Error('Invalid VOICEVOX speakers response');
 		}
 
-		return speakers as VoicevoxSpeaker[];
+		return speakers as Speaker[];
 	}
 
-	async getVoices(): Promise<VoicevoxVoice[]> {
+	async getVoices(): Promise<Voice[]> {
 		const speakers = await this.getSpeakers();
 
 		return speakers.flatMap((speaker) =>
@@ -82,7 +82,7 @@ export class VoicevoxProxyClient {
 		);
 	}
 
-	async getVoiceById(id: number): Promise<VoicevoxVoice | undefined> {
+	async getVoiceById(id: number): Promise<Voice | undefined> {
 		const voices = await this.getVoices();
 		return voices.find((voice) => voice.id === id);
 	}
@@ -94,16 +94,14 @@ export class VoicevoxProxyClient {
 
 	// Audio
 
-	async getAudio(options: VoicevoxSpeechOptions): Promise<Blob> {
+	async getAudio(options: SpeechOptions): Promise<Blob> {
 		const normalized = normalizeSpeechOptions(options);
 		const key = await getCacheKey(normalized);
 
 		return this.getCachedAudio(key, normalized);
 	}
 
-	async createAudioRequest(
-		options: VoicevoxSpeechOptions,
-	): Promise<VoicevoxAudioRequest> {
+	async createAudioRequest(options: SpeechOptions): Promise<AudioRequest> {
 		const normalized = normalizeSpeechOptions(options);
 		const key = await getCacheKey(normalized);
 
