@@ -1,6 +1,6 @@
 {
 	"name": "@vdegenne/voicevox",
-	"version": "0.1.19",
+	"version": "0.1.20",
 	"description": "Snar reactive controller TS helper to interact with VoiceVox TTS server.",
 	"type": "module",
 	"exports": {

@@ -25,7 +25,7 @@ export class VoicevoxProxyClient {
 	private speakers?: Speaker[];
 	private speakersPromise?: Promise<Speaker[]>;
 
-	constructor(endpoint = 'http://127.0.0.1:50021') {
+	constructor({endpoint = 'http://127.0.0.1:50021'}: {endpoint?: string} = {}) {
 		this.endpoint = endpoint.replace(/\/+$/, '');
 	}
 
